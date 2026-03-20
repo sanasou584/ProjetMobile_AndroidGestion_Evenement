@@ -22,6 +22,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_dashboard);
+        //recupere l'id des element
         this.cardMyEvents = (MaterialCardView)  findViewById(R.id.cardMyEvents);
         this.cardAddEvent = (MaterialCardView) findViewById(R.id.cardAddEvent);
         this.cardParticipants = (MaterialCardView) findViewById(R.id.cardParticipants);
@@ -36,18 +37,22 @@ public class AdminDashboardActivity extends AppCompatActivity {
             return insets;
         });*/
     }
+    //fct : lors du clique sur l'element il passe a l'activite manager
     public void myEvent(View v){
         Intent intent = new Intent(AdminDashboardActivity.this,ManageEventsActivity.class);
         startActivity(intent);
     }
+    //fct : lors du clique sur l'element il passe a l'activite ajoutevent
     public void addEvent(View v){
         Intent intent = new Intent(AdminDashboardActivity.this,AddEventActivity.class);
         startActivity(intent);
     }
+    //fct : lors du clique sur l'element il passe a l'activite liste des patients
     public void listPart(View v){
         Intent intent = new Intent(AdminDashboardActivity.this,ParticipantListActivity.class);
         startActivity(intent);
     }
+    //fct : lors du clique sur l'element il se deconnecte
     public void deconnecter(View v){
         Intent intent = new Intent(AdminDashboardActivity.this,ManageEventsActivity.class);
         startActivity(intent);
