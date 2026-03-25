@@ -220,6 +220,27 @@
                                 android:textColorHint="#A0A7B4" />
                         </LinearLayout>
                     </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Prix"
+                        android:textColor="#24324A"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/txtprix"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_input"
+                        android:hint="Ex : 25.0"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:textColor="#1F2937"
+                        android:textColorHint="#A0A7B4" />
 
                     <TextView
                         android:layout_width="wrap_content"

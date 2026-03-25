@@ -48,6 +48,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.tvDateTime.setText(event.getDate() + " • " + event.getHeure());
             holder.tvLocation.setText(event.getLieu());
             holder.tvCapacity.setText("Capacité : " + event.getCapacite());
+            holder.tvPrice.setText("Prix : " + event.getPrix() + " DT");
 
             holder.btnEdit.setOnClickListener(v -> {
                 Intent intent = new Intent(context, AddEventActivity.class);
@@ -57,6 +58,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 intent.putExtra("lieu", event.getLieu());
                 intent.putExtra("date", event.getDate());
                 intent.putExtra("heure", event.getHeure());
+                intent.putExtra("prix", event.getPrix());
                 intent.putExtra("capacite", event.getCapacite());
                 intent.putExtra("actif", event.isActif());
                 context.startActivity(intent);
@@ -71,7 +73,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
         static class EventViewHolder extends RecyclerView.ViewHolder {
-            TextView tvTitle, tvDateTime, tvLocation, tvCapacity;
+            TextView tvTitle, tvDateTime, tvLocation, tvCapacity,tvPrice;
             Button btnEdit, btnDelete;
 
             public EventViewHolder(@NonNull View itemView) {
@@ -80,6 +82,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 tvDateTime = itemView.findViewById(R.id.tvDateTime);
                 tvLocation = itemView.findViewById(R.id.tvLocation);
                 tvCapacity = itemView.findViewById(R.id.tvCapacity);
+                tvPrice = itemView.findViewById(R.id.tvPrice);
                 btnEdit = itemView.findViewById(R.id.btnEdit);
                 btnDelete = itemView.findViewById(R.id.btnDelete);
             }

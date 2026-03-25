@@ -10,8 +10,11 @@ public class Event {
         private int capacite;
         private String organizerId;
         private boolean actif;
+        private double prix;
 
-        public Event() {
+
+
+    public Event() {
         }
 
         public Event(String id, String titre, String description, String lieu, String date,
@@ -53,5 +56,12 @@ public class Event {
 
         public boolean isActif() { return actif; }
         public void setActif(boolean actif) { this.actif = actif; }
+        public double getPrix() {
+            return prix;
+        }
+
+        public void setPrix(double prix) {
+            this.prix = prix;
+        }
 }
 

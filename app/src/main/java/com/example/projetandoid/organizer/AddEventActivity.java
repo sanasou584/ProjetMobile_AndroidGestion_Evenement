@@ -29,39 +29,61 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 public class AddEventActivity extends AppCompatActivity {
-    private EditText txtTitre ,txtDesc,txtLieu,txtDate,txtHeure,txtCapacite;
+    private EditText txtTitre, txtDesc, txtLieu, txtDate, txtHeure, txtCapacite, txtPrix;
     private Button btnAjouterEve;
     private CheckBox checkActive;
     private ImageView btnBack;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private String eventId = null;
+    private boolean modeEdit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_event);
-        /*ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });*/
-        this.txtTitre = (EditText) findViewById(R.id.txtTitle);
-        this.txtDesc = (EditText) findViewById(R.id.txtdescription);
-        this.txtDate = (EditText) findViewById(R.id.txtate);
-        this.txtHeure = (EditText) findViewById(R.id.txttime);
-        this.txtLieu = (EditText) findViewById(R.id.txtlocation);
-        this.txtCapacite = (EditText) findViewById(R.id.txtcapacity);
-        this.btnAjouterEve = (Button) findViewById(R.id.btnajouterEvent);
-        this.checkActive = (CheckBox) findViewById(R.id.checkActive);
-        this.btnBack = (ImageView) findViewById(R.id.btnBack);
-        btnAjouterEve.setOnClickListener(this::addEvent);
-        txtHeure.setOnClickListener(this::openDatePicker);
-        txtDate.setOnClickListener(this::openTimePicker);
-        btnBack.setOnClickListener(this::backtohome);
+
+        this.txtTitre = findViewById(R.id.txtTitle);
+        this.txtDesc = findViewById(R.id.txtdescription);
+        this.txtDate = findViewById(R.id.txtate);
+        this.txtHeure = findViewById(R.id.txttime);
+        this.txtLieu = findViewById(R.id.txtlocation);
+        this.txtCapacite = findViewById(R.id.txtcapacity);
+        this.btnAjouterEve = findViewById(R.id.btnajouterEvent);
+        this.checkActive = findViewById(R.id.checkActive);
+        this.btnBack = findViewById(R.id.btnBack);
+        this.txtPrix = findViewById(R.id.txtprix);
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        readIntentData();
+
+        btnAjouterEve.setOnClickListener(this::addEvent);
+        txtDate.setOnClickListener(this::openDatePicker);
+        txtHeure.setOnClickListener(this::openTimePicker);
+        btnBack.setOnClickListener(this::backtohome);
+    }
+    private void readIntentData() {
+        if (getIntent() != null && getIntent().hasExtra("eventId")) {
+            modeEdit = true;
+            eventId = getIntent().getStringExtra("eventId");
+
+            txtTitre.setText(getIntent().getStringExtra("titre"));
+            txtDesc.setText(getIntent().getStringExtra("description"));
+            txtLieu.setText(getIntent().getStringExtra("lieu"));
+            txtDate.setText(getIntent().getStringExtra("date"));
+            txtHeure.setText(getIntent().getStringExtra("heure"));
+            txtPrix.setText(String.valueOf(getIntent().getDoubleExtra("prix", 0.0)));
+            txtCapacite.setText(String.valueOf(getIntent().getIntExtra("capacite", 0)));
+            checkActive.setChecked(getIntent().getBooleanExtra("actif", true));
+
+            btnAjouterEve.setText("Modifier l’événement");
+        } else {
+            btnAjouterEve.setText("Enregistrer l’événement");
+        }
     }
 
     public void backtohome(View v){
@@ -125,6 +147,7 @@ public class AddEventActivity extends AppCompatActivity {
         public void addEvent(View v){
             String title = txtTitre.getText().toString();
             String description = txtDesc.getText().toString();
+            String prixStr = txtPrix.getText().toString().trim();
             String capacite = txtCapacite.getText().toString();
             String heure = txtHeure.getText().toString();
             String date = txtDate.getText().toString();
@@ -181,6 +204,26 @@ public class AddEventActivity extends AppCompatActivity {
                 txtCapacite.requestFocus();
                 return;
             }
+            if (TextUtils.isEmpty(prixStr)) {
+                txtPrix.setError("Prix obligatoire");
+                txtPrix.requestFocus();
+                return;
+            }
+
+            double prix;
+            try {
+                prix = Double.parseDouble(prixStr);
+            } catch (NumberFormatException e) {
+                txtPrix.setError("Prix invalide");
+                txtPrix.requestFocus();
+                return;
+            }
+
+            if (prix < 0) {
+                txtPrix.setError("Le prix doit être >= 0");
+                txtPrix.requestFocus();
+                return;
+            }
 
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser == null) {
@@ -198,29 +241,49 @@ public class AddEventActivity extends AppCompatActivity {
         eventMap.put("lieu", location);
         eventMap.put("date", date);
         eventMap.put("heure", heure);
+        eventMap.put("prix", prix);
         eventMap.put("capacite", capacity);
         eventMap.put("organizerId", organizerId);
         eventMap.put("actif", isActive);
-        eventMap.put("createdAt", FieldValue.serverTimestamp());
-            db.collection("events")
-                    .add(eventMap)
-                    .addOnSuccessListener(documentReference -> {
-                        btnAjouterEve.setEnabled(true);
-                        Toast.makeText(AddEventActivity.this, "Événement ajouté avec succès", Toast.LENGTH_SHORT).show();
-                        clearForm();
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        btnAjouterEve.setEnabled(true);
-                        Toast.makeText(AddEventActivity.this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    });
-    }
+            if (modeEdit && eventId != null) {
+                eventMap.put("updatedAt", FieldValue.serverTimestamp());
+
+                db.collection("events")
+                        .document(eventId)
+                        .update(eventMap)
+                        .addOnSuccessListener(unused -> {
+                            btnAjouterEve.setEnabled(true);
+                            Toast.makeText(AddEventActivity.this, "Événement modifié avec succès", Toast.LENGTH_SHORT).show();
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            btnAjouterEve.setEnabled(true);
+                            Toast.makeText(AddEventActivity.this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+
+            } else {
+                eventMap.put("createdAt", FieldValue.serverTimestamp());
+
+                db.collection("events")
+                        .add(eventMap)
+                        .addOnSuccessListener(documentReference -> {
+                            btnAjouterEve.setEnabled(true);
+                            Toast.makeText(AddEventActivity.this, "Événement ajouté avec succès", Toast.LENGTH_SHORT).show();
+                            clearForm();
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            btnAjouterEve.setEnabled(true);
+                            Toast.makeText(AddEventActivity.this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+            }    }
     private void clearForm() {
         txtTitre.setText("");
         txtDesc.setText("");
         txtLieu.setText("");
         txtDate.setText("");
         txtHeure.setText("");
+        txtPrix.setText("");
         txtCapacite.setText("");
         checkActive.setChecked(false);
     }

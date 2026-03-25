@@ -8,10 +8,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageEventsActivity extends AppCompatActivity {
+
     private RecyclerView recyclerEvents;
     private TextView tvEmpty;
     private ImageView btnBack, btnAddEvent;
@@ -41,11 +40,7 @@ public class ManageEventsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_manage_events);
-        /*ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });*/
+
         recyclerEvents = findViewById(R.id.recyclerEvents);
         tvEmpty = findViewById(R.id.tvEmpty);
         btnBack = findViewById(R.id.btnBack);
@@ -56,8 +51,9 @@ public class ManageEventsActivity extends AppCompatActivity {
 
         recyclerEvents.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new EventAdapter(this, eventList, event -> deleteEvent(event.getId()));
+        adapter = new EventAdapter(this, eventList, event -> showDeleteDialog(event));
         recyclerEvents.setAdapter(adapter);
+
         btnBack.setOnClickListener(v -> finish());
 
         btnAddEvent.setOnClickListener(v -> {
@@ -65,8 +61,8 @@ public class ManageEventsActivity extends AppCompatActivity {
         });
 
         loadMyEvents();
-
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -113,6 +109,16 @@ public class ManageEventsActivity extends AppCompatActivity {
                                 Toast.LENGTH_LONG).show());
     }
 
+    private void showDeleteDialog(Event event) {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmation")
+                .setMessage("Voulez-vous vraiment supprimer l'événement : " + event.getTitre() + " ?")
+                .setCancelable(true)
+                .setPositiveButton("Oui", (dialog, which) -> deleteEvent(event.getId()))
+                .setNegativeButton("Non", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     private void deleteEvent(String eventId) {
         db.collection("events")
                 .document(eventId)
@@ -126,5 +132,4 @@ public class ManageEventsActivity extends AppCompatActivity {
                                 "Erreur suppression : " + e.getMessage(),
                                 Toast.LENGTH_LONG).show());
     }
-
 }

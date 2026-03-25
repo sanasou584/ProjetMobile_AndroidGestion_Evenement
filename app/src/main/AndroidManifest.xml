@@ -12,6 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjetAndoid">
         <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".participant.EventListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".participant.EventDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".organizer.ParticipantListActivity"
             android:exported="false" />
         <activity
@@ -28,9 +40,6 @@
             android:exported="false" />
         <activity
             android:name=".ui.ath.RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SplashScreenActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

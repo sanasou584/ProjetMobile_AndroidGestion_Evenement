@@ -52,4 +52,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.cardview:cardview:1.0.0")
+    implementation ("com.google.firebase:firebase-storage")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
 }
